@@ -15,3 +15,6 @@ add_subdirectory ("01-Test")
 
 set(EXECUTABLE_CUSTOM_NAME "02-Snake")
 add_subdirectory ("02-Snake")
+
+set(EXECUTABLE_CUSTOM_NAME "03-Link")
+add_subdirectory ("03-Link")
