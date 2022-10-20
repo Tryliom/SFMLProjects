@@ -1,13 +1,15 @@
 #include "Snake.h"
 
+#include <numbers>
+
 Snake::Snake(const bool useIA)
 {
 	_body = {};
 	_canTakeDamage = true;
 	_direction = Direction::RIGHT;
 	_canChangeDirection = true;
-	_elapsed = 0;
-	_invincibilityTime = 0;
+	_elapsed = sf::milliseconds(0);
+	_invincibilityTime = sf::milliseconds(0);
 	_useIA = useIA;
 
 	int x = START_X;
@@ -86,11 +88,11 @@ void Snake::updateIA(const sf::Vector2f eggPosition)
 	}
 }
 
-void Snake::takeDamage()
+void Snake::TakeDamage()
 {
 	_body.pop_back();
 	_canTakeDamage = false;
-	_invincibilityTime = 500 * 1000;
+	_invincibilityTime = sf::milliseconds(500);
 }
 
 void Snake::ChangeDirection(const Direction direction)
@@ -104,15 +106,15 @@ void Snake::ChangeDirection(const Direction direction)
 
 void Snake::Update(sf::Time elapsed, sf::Vector2f eggPosition)
 {
-	_elapsed += elapsed.asMicroseconds();
+	_elapsed += elapsed;
 
-	if (_invincibilityTime > 0)
+	if (_invincibilityTime.asMicroseconds() > 0)
 	{
-		_invincibilityTime -= elapsed.asMicroseconds();
+		_invincibilityTime -= elapsed;
 
-		if (_invincibilityTime <= 0)
+		if (_invincibilityTime.asMicroseconds() <= 0)
 		{
-			_invincibilityTime = 0;
+			_invincibilityTime = sf::Time::Zero;
 			_canTakeDamage = true;
 		}
 	}
@@ -120,11 +122,11 @@ void Snake::Update(sf::Time elapsed, sf::Vector2f eggPosition)
 	while (UPDATE_PER_SECOND <= _elapsed)
 	{
 		const sf::Vector2f nextPosition = getNextPosition(_direction);
-		int offsetColor = 0;
+		int alpha = 255;
 
-		if (_invincibilityTime > 0)
+		if (_invincibilityTime > sf::Time::Zero)
 		{
-			offsetColor = 20;
+			alpha = 150 * sin(static_cast<float>(_invincibilityTime.asMilliseconds()) / 500.0f * 2.0f * std::numbers::pi);
 		}
 
 		for (int i = _body.size() - 1; i > 0; i--)
@@ -136,21 +138,21 @@ void Snake::Update(sf::Time elapsed, sf::Vector2f eggPosition)
 
 			if (_useIA)
 			{
-				_body[i].setFillColor(sf::Color(255 - 155 / _body.size() * (i + 1) - offsetColor, 70 - offsetColor, 70 - offsetColor));
+				_body[i].setFillColor(sf::Color(255 - 155 / _body.size() * (i + 1), 70, 70, alpha));
 			}
 			else
 			{
-				_body[i].setFillColor(sf::Color(70 - offsetColor, 70 - offsetColor, 255 - 155 / _body.size() * (i + 1) - offsetColor));
+				_body[i].setFillColor(sf::Color(70, 70, 255 - 155 / _body.size() * (i + 1), alpha));
 			}
 		}
 
 		if (_useIA)
 		{
-			_body[0].setFillColor(sf::Color(255 - offsetColor, 70 - offsetColor, 70 - offsetColor));
+			_body[0].setFillColor(sf::Color(255, 70, 70, alpha));
 		}
 		else
 		{
-			_body[0].setFillColor(sf::Color(70 - offsetColor, 70 - offsetColor, 255 - offsetColor));
+			_body[0].setFillColor(sf::Color(70, 70, 255, alpha));
 		}
 
 		_body[0].setPosition(nextPosition);
@@ -173,16 +175,15 @@ void Snake::Grow()
 	_body.push_back(shape);
 }
 
-void Snake::CheckCollisions(const std::vector<sf::Vector2f>& opponentPositions)
+bool Snake::Hit(const std::vector<sf::Vector2f>& opponentPositions) const
 {
-	if (_canTakeDamage && _invincibilityTime == 0)
+	if (_canTakeDamage && _invincibilityTime == sf::Time::Zero)
 	{
 		for (auto& position : opponentPositions)
 		{
 			if (_body[0].getPosition() == position)
 			{
-				takeDamage();
-				return;
+				return true;
 			}
 		}
 
@@ -190,11 +191,12 @@ void Snake::CheckCollisions(const std::vector<sf::Vector2f>& opponentPositions)
 		{
 			if (_body[0].getPosition() == _body[i].getPosition())
 			{
-				takeDamage();
-				return;
+				return true;
 			}
 		}
 	}
+
+	return false;
 }
 
 bool Snake::CanEatEgg(const sf::Vector2f& eggPosition) const

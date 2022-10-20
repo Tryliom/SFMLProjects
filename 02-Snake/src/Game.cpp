@@ -7,7 +7,12 @@ Game::Game() : _window(sf::VideoMode(1000, 700), "Snake"), _opponent(true)
 	_window.setVerticalSyncEnabled(true);
 	_window.setFramerateLimit(144);
 
+	_font.loadFromFile("data/font/pixelmix.ttf");
+
 	_clock = sf::Clock();
+
+	_comboDuration = sf::milliseconds(0);
+	_lost = false;
 }
 
 void Game::Start()
@@ -46,13 +51,62 @@ void Game::Start()
             }
         }
 
+		sf::Vector2u size = _window.getSize();
+
         // Graphical Region
         _window.clear(sf::Color::Black);
 
         // Draw snake
-        _window.draw(_player);
-		_window.draw(_opponent);
-    	_window.draw(_egg);
+		if (!_lost)
+		{
+			_window.draw(_player);
+			_window.draw(_opponent);
+			_window.draw(_egg);
+		}
+		else
+		{
+			sf::Text gameOver;
+			gameOver.setString(sf::String("Game Over"));
+			gameOver.setFont(_font);
+			gameOver.setCharacterSize(50);
+			gameOver.setPosition(size.x / 2, size.y / 2);
+			gameOver.setOrigin(gameOver.getGlobalBounds().width / 2, gameOver.getGlobalBounds().height / 2);
+			gameOver.setFillColor(sf::Color(255, 100, 100));
+
+			_window.draw(gameOver);
+		}
+
+		sf::Text score;
+		score.setString(sf::String("Score: " + std::to_string(_score) + " pts"));
+		score.setFont(_font);
+		score.setCharacterSize(20);
+		score.setPosition(30, 10);
+		score.setFillColor(sf::Color(255, 255, 255, 155));
+
+		_window.draw(score);
+
+		sf::Text combo;
+		combo.setString(sf::String("Combo x" + std::to_string(_combo)));
+		combo.setFont(_font);
+		combo.setCharacterSize(20);
+		combo.setPosition(30, 40);
+		combo.setFillColor(sf::Color(255, 255, 255, 155));
+
+		_window.draw(combo);
+
+		if (_comboDuration > sf::Time::Zero)
+		{
+			sf::RectangleShape comboLine;
+			float height = static_cast<float>(size.y) * 
+				static_cast<float>(_comboDuration.asMicroseconds()) / 
+				static_cast<float>(COMBO_MAX_DURATION.asMicroseconds());
+
+			comboLine.setFillColor(sf::Color(255, 255, 255, 255));
+			comboLine.setPosition(10, 10);
+			comboLine.setSize(sf::Vector2f(10, height));
+
+			_window.draw(comboLine);
+		}
 
         // Window Display
         _window.display();
@@ -61,22 +115,59 @@ void Game::Start()
 
 void Game::update(const sf::Time elapsed)
 {
-	_player.Update(elapsed, _egg.GetPosition());
-	_opponent.Update(elapsed, _egg.GetPosition());
-
-	_player.CheckCollisions(_opponent.GetPositions());
-	_opponent.CheckCollisions(_player.GetPositions());
-
-	if (_player.CanEatEgg(_egg.GetPosition()))
+	if (!_lost)
 	{
-		setEggPosition();
-		_player.Grow();
-	}
+		_player.Update(elapsed, _egg.GetPosition());
+		_opponent.Update(elapsed, _egg.GetPosition());
 
-	if (_opponent.CanEatEgg(_egg.GetPosition()))
-	{
-		setEggPosition();
-		_opponent.Grow();
+		if (_player.Hit(_opponent.GetPositions()))
+		{
+			_player.TakeDamage();
+
+			if (static_cast<int>(_player.GetPositions().size()) <= 1)
+			{
+				_lost = true;
+				return;
+			}
+		}
+
+		if (_opponent.Hit(_player.GetPositions()))
+		{
+			_opponent.TakeDamage();
+			_score += 5;
+			_comboDuration += sf::milliseconds(500);
+
+			if (_comboDuration > COMBO_MAX_DURATION)
+			{
+				_comboDuration = COMBO_MAX_DURATION;
+			}
+		}
+
+		if (_player.CanEatEgg(_egg.GetPosition()))
+		{
+			setEggPosition();
+			_player.Grow();
+			_score += 10;
+			_score += _combo;
+			_comboDuration = COMBO_MAX_DURATION;
+			_combo++;
+		}
+
+		if (_opponent.CanEatEgg(_egg.GetPosition()))
+		{
+			setEggPosition();
+			_opponent.Grow();
+		}
+
+		if (_comboDuration < sf::Time::Zero)
+		{
+			_comboDuration = sf::Time::Zero;
+			_combo = 0;
+		}
+		else
+		{
+			_comboDuration -= elapsed;
+		}
 	}
 }
 

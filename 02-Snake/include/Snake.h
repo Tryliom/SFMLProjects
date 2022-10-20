@@ -7,7 +7,7 @@ constexpr int SPEED = RADIUS * 2;
 constexpr int START_SIZE = 3;
 constexpr float START_X = 400.0f;
 constexpr float START_Y = 300.0f;
-constexpr int UPDATE_PER_SECOND = 1000000 / 30;
+const sf::Time UPDATE_PER_SECOND = sf::seconds(1.0f / 30.0f);
 
 enum class Direction
 {
@@ -29,24 +29,25 @@ private:
 
 	bool _canTakeDamage;
 	bool _canChangeDirection;
-	int _elapsed;
-	int _invincibilityTime;
+
+	sf::Time _elapsed;
+	sf::Time _invincibilityTime;
 
 	[[nodiscard]] sf::Vector2f getNextPosition(Direction nextDirection) const;
 
 	void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
 
 	void updateIA(sf::Vector2f eggPosition);
-	void takeDamage();
 
 public:
 	void ChangeDirection(const Direction direction);
 	void Update(sf::Time elapsed, sf::Vector2f eggPosition);
 	void Grow();
-	void CheckCollisions(const std::vector<sf::Vector2f>& opponentPositions);
+	void TakeDamage();
 
 	[[nodiscard]] bool CanEatEgg(const sf::Vector2f& eggPosition) const;
 	[[nodiscard]] Direction GetDirection() const { return _direction; }
 	[[nodiscard]] std::vector<sf::Vector2f> GetPositions() const;
 	[[nodiscard]] bool IsAlive() const { return static_cast<int>(_body.size()) > 0; }
+	[[nodiscard]] bool Hit(const std::vector<sf::Vector2f>& opponentPositions) const;
 };
