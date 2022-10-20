@@ -57,7 +57,7 @@ void Game::Start()
         _window.clear(sf::Color::Black);
 
         // Draw snake
-		if (!_player.IsAlive())
+		if (_player.IsAlive())
 		{
 			_window.draw(_player);
 			if (_opponent.IsAlive())
@@ -172,6 +172,7 @@ void Game::update(const sf::Time elapsed)
 			{
 				_score += 200;
 				_opponentSpawnTime = SPAWN_DURATION;
+				//TODO: Add a new egg
 
 				return;
 			}
@@ -190,6 +191,7 @@ void Game::update(const sf::Time elapsed)
 		if (_opponentSpawnTime < sf::Time::Zero)
 		{
 			_opponentSpawnTime = SPAWN_DURATION;
+			//TODO: Make a better AI when he respawns and add more length to it
 			_opponent = Snake(true);
 		}
 	}

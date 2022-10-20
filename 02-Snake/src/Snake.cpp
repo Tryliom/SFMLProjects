@@ -99,43 +99,74 @@ void Snake::draw(sf::RenderTarget& target, sf::RenderStates states) const
 void Snake::updateIA(sf::Vector2f eggPosition)
 {
 	const sf::Vector2f head = _body.front().getPosition();
-
-	if (_invincibilityTime > sf::Time::Zero)
-	{
-		// If the snake is invincible, confuse the AI by making it move randomly
-		eggPosition.x += Random::GetFloat(-300.0f, 300.0f);
-		eggPosition.y += Random::GetFloat(-300.0f, 300.0f);
-	}
+	Direction nextDirection = _direction;
 
 	if ((_direction == Direction::RIGHT && eggPosition.x <= head.x) || (_direction == Direction::LEFT && eggPosition.x >= head.x))
 	{
 		if (eggPosition.y <= head.y)
 		{
-			ChangeDirection(Direction::UP);
+			nextDirection = Direction::UP;
 		}
 		else
 		{
-			ChangeDirection(Direction::DOWN);
+			nextDirection = Direction::DOWN;
 		}
 	}
 	else if ((_direction == Direction::UP && eggPosition.y >= head.y) || (_direction == Direction::DOWN && eggPosition.y <= head.y))
 	{
 		if (eggPosition.x <= head.x)
 		{
-			ChangeDirection(Direction::LEFT);
+			nextDirection = Direction::LEFT;
 		}
 		else
 		{
-			ChangeDirection(Direction::RIGHT);
+			nextDirection = Direction::RIGHT;
 		}
 	}
+
+	if (_invincibilityTime > sf::Time::Zero)
+	{
+		// If the snake is invincible, confuse the AI by making move away from the egg
+		if (nextDirection == Direction::UP || nextDirection == Direction::DOWN)
+		{
+			if (eggPosition.x <= head.x)
+			{
+				nextDirection = Direction::RIGHT;
+			}
+			else
+			{
+				nextDirection = Direction::LEFT;
+			}
+		}
+		else
+		{
+			if (eggPosition.y <= head.y)
+			{
+				nextDirection = Direction::DOWN;
+			}
+			else
+			{
+				nextDirection = Direction::UP;
+			}
+		}
+	}
+
+	ChangeDirection(nextDirection);
 }
 
 void Snake::TakeDamage()
 {
 	_body.pop_back();
 	_canTakeDamage = false;
-	_invincibilityTime = sf::milliseconds(500);
+
+	if (_useIA)
+	{
+		_invincibilityTime = sf::milliseconds(2000);
+	}
+	else
+	{
+		_invincibilityTime = sf::milliseconds(500);
+	}
 }
 
 void Snake::ChangeDirection(const Direction direction)
