@@ -7,7 +7,8 @@ constexpr int SPEED = RADIUS * 2;
 constexpr int START_SIZE = 3;
 constexpr float START_X = 400.0f;
 constexpr float START_Y = 300.0f;
-const sf::Time UPDATE_PER_SECOND = sf::seconds(1.0f / 30.0f);
+const sf::Time PLAYER_UPDATE_PER_SECOND = sf::seconds(1.0f / 30.0f);
+const sf::Time IA_UPDATE_PER_SECOND = sf::seconds(1.0f / 25.0f);
 
 enum class Direction
 {
@@ -20,7 +21,7 @@ enum class Direction
 class Snake final : public sf::Drawable
 {
 public:
-	Snake(bool useIA = false);
+	explicit Snake(bool useIA = false);
 
 private:
 	std::vector<sf::CircleShape> _body;
@@ -34,9 +35,9 @@ private:
 	sf::Time _invincibilityTime;
 
 	[[nodiscard]] sf::Vector2f getNextPosition(Direction nextDirection) const;
+	void setBodyColor(int i);
 
 	void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
-
 	void updateIA(sf::Vector2f eggPosition);
 
 public:
@@ -48,6 +49,6 @@ public:
 	[[nodiscard]] bool CanEatEgg(const sf::Vector2f& eggPosition) const;
 	[[nodiscard]] Direction GetDirection() const { return _direction; }
 	[[nodiscard]] std::vector<sf::Vector2f> GetPositions() const;
-	[[nodiscard]] bool IsAlive() const { return static_cast<int>(_body.size()) > 0; }
+	[[nodiscard]] bool IsAlive() const { return static_cast<int>(_body.size()) > 1; }
 	[[nodiscard]] bool Hit(const std::vector<sf::Vector2f>& opponentPositions) const;
 };

@@ -2,6 +2,8 @@
 
 #include <numbers>
 
+#include "Random.h"
+
 Snake::Snake(const bool useIA)
 {
 	_body = {};
@@ -52,6 +54,40 @@ sf::Vector2f Snake::getNextPosition(const Direction nextDirection) const
 	return nextPosition;
 }
 
+void Snake::setBodyColor(int i)
+{
+	sf::Uint8 alpha = 255;
+
+	if (_invincibilityTime > sf::Time::Zero)
+	{
+		alpha = static_cast<sf::Uint8>(150 * sin(static_cast<float>(_invincibilityTime.asMilliseconds()) / 500.0f * 2.0f * std::numbers::pi));
+	}
+
+	if (i == 0)
+	{
+		if (_useIA)
+		{
+			_body[0].setFillColor(sf::Color(255, 70, 70, alpha));
+		}
+		else
+		{
+			_body[0].setFillColor(sf::Color(70, 70, 255, alpha));
+		}
+	}
+	else
+	{
+		if (_useIA)
+		{
+			_body[i].setFillColor(sf::Color(255 - 155 / _body.size() * (i + 1), 70, 70, alpha));
+		}
+		else
+		{
+			_body[i].setFillColor(sf::Color(70, 70, 255 - 155 / _body.size() * (i + 1), alpha));
+		}
+	}
+
+}
+
 void Snake::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
 	for (auto& shape : _body)
@@ -60,9 +96,16 @@ void Snake::draw(sf::RenderTarget& target, sf::RenderStates states) const
 	}
 }
 
-void Snake::updateIA(const sf::Vector2f eggPosition)
+void Snake::updateIA(sf::Vector2f eggPosition)
 {
 	const sf::Vector2f head = _body.front().getPosition();
+
+	if (_invincibilityTime > sf::Time::Zero)
+	{
+		// If the snake is invincible, confuse the AI by making it move randomly
+		eggPosition.x += Random::GetFloat(-300.0f, 300.0f);
+		eggPosition.y += Random::GetFloat(-300.0f, 300.0f);
+	}
 
 	if ((_direction == Direction::RIGHT && eggPosition.x <= head.x) || (_direction == Direction::LEFT && eggPosition.x >= head.x))
 	{
@@ -119,14 +162,14 @@ void Snake::Update(sf::Time elapsed, sf::Vector2f eggPosition)
 		}
 	}
 
-	while (UPDATE_PER_SECOND <= _elapsed)
+	while (PLAYER_UPDATE_PER_SECOND <= _elapsed)
 	{
 		const sf::Vector2f nextPosition = getNextPosition(_direction);
-		int alpha = 255;
+		sf::Uint8 alpha = 255;
 
 		if (_invincibilityTime > sf::Time::Zero)
 		{
-			alpha = 150 * sin(static_cast<float>(_invincibilityTime.asMilliseconds()) / 500.0f * 2.0f * std::numbers::pi);
+			alpha = static_cast<sf::Uint8>(150 * sin(static_cast<float>(_invincibilityTime.asMilliseconds()) / 500.0f * 2.0f * std::numbers::pi));
 		}
 
 		for (int i = _body.size() - 1; i > 0; i--)
@@ -136,33 +179,23 @@ void Snake::Update(sf::Time elapsed, sf::Vector2f eggPosition)
 				_body[i].setPosition(_body[i - 1].getPosition());
 			}
 
-			if (_useIA)
-			{
-				_body[i].setFillColor(sf::Color(255 - 155 / _body.size() * (i + 1), 70, 70, alpha));
-			}
-			else
-			{
-				_body[i].setFillColor(sf::Color(70, 70, 255 - 155 / _body.size() * (i + 1), alpha));
-			}
+			setBodyColor(i);
 		}
 
-		if (_useIA)
-		{
-			_body[0].setFillColor(sf::Color(255, 70, 70, alpha));
-		}
-		else
-		{
-			_body[0].setFillColor(sf::Color(70, 70, 255, alpha));
-		}
+		setBodyColor(0);
 
 		_body[0].setPosition(nextPosition);
 		_canChangeDirection = true;
 		_canTakeDamage = true;
-		_elapsed -= UPDATE_PER_SECOND;
 
 		if (_useIA)
 		{
+			_elapsed -= IA_UPDATE_PER_SECOND;
 			updateIA(eggPosition);
+		}
+		else
+		{
+			_elapsed -= PLAYER_UPDATE_PER_SECOND;
 		}
 	}
 }
@@ -201,7 +234,7 @@ bool Snake::Hit(const std::vector<sf::Vector2f>& opponentPositions) const
 
 bool Snake::CanEatEgg(const sf::Vector2f& eggPosition) const
 {
-	return _body[0].getPosition() == eggPosition;
+	return _invincibilityTime == sf::Time::Zero && _body[0].getPosition() == eggPosition;
 }
 
 std::vector<sf::Vector2f> Snake::GetPositions() const

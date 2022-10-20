@@ -12,7 +12,7 @@ Game::Game() : _window(sf::VideoMode(1000, 700), "Snake"), _opponent(true)
 	_clock = sf::Clock();
 
 	_comboDuration = sf::milliseconds(0);
-	_lost = false;
+	_opponentSpawnTime = sf::milliseconds(0);
 }
 
 void Game::Start()
@@ -57,10 +57,13 @@ void Game::Start()
         _window.clear(sf::Color::Black);
 
         // Draw snake
-		if (!_lost)
+		if (!_player.IsAlive())
 		{
 			_window.draw(_player);
-			_window.draw(_opponent);
+			if (_opponent.IsAlive())
+			{
+				_window.draw(_opponent);
+			}
 			_window.draw(_egg);
 		}
 		else
@@ -115,31 +118,17 @@ void Game::Start()
 
 void Game::update(const sf::Time elapsed)
 {
-	if (!_lost)
+	if (_player.IsAlive())
 	{
 		_player.Update(elapsed, _egg.GetPosition());
-		_opponent.Update(elapsed, _egg.GetPosition());
 
 		if (_player.Hit(_opponent.GetPositions()))
 		{
 			_player.TakeDamage();
 
-			if (static_cast<int>(_player.GetPositions().size()) <= 1)
+			if (!_player.IsAlive())
 			{
-				_lost = true;
 				return;
-			}
-		}
-
-		if (_opponent.Hit(_player.GetPositions()))
-		{
-			_opponent.TakeDamage();
-			_score += 5;
-			_comboDuration += sf::milliseconds(500);
-
-			if (_comboDuration > COMBO_MAX_DURATION)
-			{
-				_comboDuration = COMBO_MAX_DURATION;
 			}
 		}
 
@@ -153,12 +142,6 @@ void Game::update(const sf::Time elapsed)
 			_combo++;
 		}
 
-		if (_opponent.CanEatEgg(_egg.GetPosition()))
-		{
-			setEggPosition();
-			_opponent.Grow();
-		}
-
 		if (_comboDuration < sf::Time::Zero)
 		{
 			_comboDuration = sf::Time::Zero;
@@ -167,6 +150,47 @@ void Game::update(const sf::Time elapsed)
 		else
 		{
 			_comboDuration -= elapsed;
+		}
+	}
+
+	if (_opponent.IsAlive())
+	{
+		_opponent.Update(elapsed, _egg.GetPosition());
+
+		if (_opponent.Hit(_player.GetPositions()))
+		{
+			_opponent.TakeDamage();
+			_score += 5;
+			_comboDuration += sf::milliseconds(500);
+
+			if (_comboDuration > COMBO_MAX_DURATION)
+			{
+				_comboDuration = COMBO_MAX_DURATION;
+			}
+
+			if (!_opponent.IsAlive())
+			{
+				_score += 200;
+				_opponentSpawnTime = SPAWN_DURATION;
+
+				return;
+			}
+		}
+
+		if (_opponent.CanEatEgg(_egg.GetPosition()))
+		{
+			setEggPosition();
+			_opponent.Grow();
+		}
+	}
+	else
+	{
+		_opponentSpawnTime -= elapsed;
+
+		if (_opponentSpawnTime < sf::Time::Zero)
+		{
+			_opponentSpawnTime = SPAWN_DURATION;
+			_opponent = Snake(true);
 		}
 	}
 }
