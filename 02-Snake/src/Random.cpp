@@ -4,7 +4,7 @@
 
 namespace Random
 {
-	float GetFloat(const float min, const float max)
+	float GetFloat(const float min = 0.0f, const float max = 1.0f)
 	{
 		std::random_device osSeed;
 		const uint_least32_t seed = osSeed();
