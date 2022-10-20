@@ -10,7 +10,7 @@ enum class Direction
 	RIGHT
 };
 
-constexpr int SPEED = 1000;
+constexpr int SPEED = 500;
 
 class Game
 {

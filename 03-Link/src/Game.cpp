@@ -51,29 +51,27 @@ void Game::Start()
             {
                 _window.close();
             }
-            else if (event.type == sf::Event::KeyPressed)
-            {
-				if (event.key.code == sf::Keyboard::Left)
-				{
-					_sprite.setTexture(_directions.at(Direction::LEFT));
-					_sprite.move(-SPEED * elapsed.asSeconds(), 0);
-				}
-				else if (event.key.code == sf::Keyboard::Right)
-				{
-					_sprite.setTexture(_directions.at(Direction::RIGHT));
-					_sprite.move(SPEED * elapsed.asSeconds(), 0);
-				}
-				else if (event.key.code == sf::Keyboard::Up)
-				{
-					_sprite.setTexture(_directions.at(Direction::UP));
-					_sprite.move(0, -SPEED * elapsed.asSeconds());
-				}
-				else if (event.key.code == sf::Keyboard::Down)
-				{
-					_sprite.setTexture(_directions.at(Direction::DOWN));
-					_sprite.move(0, SPEED * elapsed.asSeconds());
-				}
-			}
+		}
+
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
+		{
+			_sprite.setTexture(_directions.at(Direction::LEFT));
+			_sprite.move(-SPEED * elapsed.asSeconds(), 0);
+		}
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
+		{
+			_sprite.setTexture(_directions.at(Direction::RIGHT));
+			_sprite.move(SPEED * elapsed.asSeconds(), 0);
+		}
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
+		{
+			_sprite.setTexture(_directions.at(Direction::UP));
+			_sprite.move(0, -SPEED * elapsed.asSeconds());
+		}
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
+		{
+			_sprite.setTexture(_directions.at(Direction::DOWN));
+			_sprite.move(0, SPEED * elapsed.asSeconds());
 		}
 
 		_window.clear();
