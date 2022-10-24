@@ -29,9 +29,26 @@ SecondPainting::SecondPainting(sf::Vector2u windowSize)
 sf::Color SecondPainting::getRandomRedColor()
 {
 	// Get random red color tainted with a bit of green and blue
-	const float hue = Random::GetFloat(320, 358);
-	const float saturation = Random::GetFloat(30, 70);
-	const float value = Random::GetFloat(80, 90);
+	float hue = Random::GetFloat(0, 25);
+	float saturation = Random::GetFloat(40, 70);
+	float value = Random::GetFloat(80, 90);
+	const float rand = Random::GetFloat();
+
+	if (Random::GetFloat() < 0.5f)
+	{
+		hue = Random::GetFloat(347, 360);
+	}
+
+	if (rand < 0.6f)
+	{
+		value = Random::GetFloat(91, 100);
+		saturation = Random::GetFloat(20, 40);
+	}
+	else if (rand < 0.8f)
+	{
+		value = Random::GetFloat(60, 79);
+		saturation = Random::GetFloat(50, 75);
+	}
 
 	return hsvToRgb(hue, saturation, value);
 }

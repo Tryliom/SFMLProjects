@@ -3,7 +3,7 @@
 
 enum class PaintingType
 {
-	FIRST, SECOND, THIRD, END
+	FIRST, SECOND, END
 };
 
 namespace PaintingFactory
