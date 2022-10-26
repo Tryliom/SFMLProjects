@@ -2,7 +2,7 @@
 
 int main()
 {
-	sf::RenderWindow window{ sf::VideoMode{ 800, 600 }, "Breaker" };
+	sf::RenderWindow window{ sf::VideoMode{ 800, 600 }, "Breaker", sf::Style::Close };
 	GameController gameController(window);
 	sf::Clock clock;
 

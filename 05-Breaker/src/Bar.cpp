@@ -44,6 +44,11 @@ void Bar::Update(const sf::Time elapsed)
 		if (!_isMoving)
 		{
 			_velocity += _velocity * - 2.0f * elapsed.asSeconds();
+
+			if (abs(_velocity) < 1.0f)
+			{
+				_velocity = 0.0f;
+			}
 		}
 	}
 }
