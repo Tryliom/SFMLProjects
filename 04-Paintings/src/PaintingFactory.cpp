@@ -2,7 +2,7 @@
 
 #include "SecondPainting.h"
 
-sf::Drawable* PaintingFactory::GetPainting(const PaintingType type, sf::Vector2u windowSize)
+sf::Drawable* PaintingFactory::GetPainting(const PaintingType type, const sf::Vector2u windowSize)
 {
 	if (type == PaintingType::FIRST)
 	{

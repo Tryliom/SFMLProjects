@@ -21,3 +21,6 @@ add_subdirectory ("03-Link")
 
 set(EXECUTABLE_CUSTOM_NAME "04-Paintings")
 add_subdirectory ("04-Paintings")
+
+set(EXECUTABLE_CUSTOM_NAME "05-Breaker")
+add_subdirectory ("05-Breaker")
