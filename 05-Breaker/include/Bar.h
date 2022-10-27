@@ -1,8 +1,8 @@
 #pragma once
 #include "SFML/Graphics.hpp"
 
-constexpr float SPEED = 300.0f;
-constexpr float MAX_SPEED = 600.0f;
+constexpr float SPEED = 500.0f;
+constexpr float MAX_SPEED = 1000.0f;
 
 class Bar final : public sf::Drawable
 {
@@ -15,6 +15,11 @@ private:
 	float _velocity;
 	bool _isMoving;
 
+	float getLeftSide() const { return _shape.getPosition().x; }
+	float getRightSide() const { return _shape.getPosition().x + _shape.getSize().x; }
+	float getTopSide() const { return _shape.getPosition().y; }
+	float getBottomSide() const { return _shape.getPosition().y + _shape.getSize().y; }
+
 public:
 	sf::RectangleShape GetBar() const { return _shape; }
 	float GetVelocity() const { return _velocity; }
@@ -23,6 +28,7 @@ public:
 
 	void MoveLeft(const sf::Time elapsed);
 	void MoveRight(const sf::Time elapsed);
+	void Stop(const sf::RectangleShape& wall);
 
 	void Update(const sf::Time elapsed);
 

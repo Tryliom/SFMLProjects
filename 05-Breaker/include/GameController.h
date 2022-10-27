@@ -5,7 +5,7 @@
 class GameController final
 {
 public:
-	explicit GameController(const sf::RenderWindow& window);
+	explicit GameController(sf::RenderWindow& window);
 
 	void Update(sf::Time elapsed);
 	void Draw(sf::RenderWindow& window) const;
@@ -13,11 +13,19 @@ public:
 
 private:
 	Player _player;
-	Ball _ball;
+	std::vector<Ball> _balls;
 	std::vector<sf::RectangleShape> _walls;
+
+	sf::RectangleShape _background;
+	sf::Texture _backgroundTexture;
+	sf::Font _font;
+
 	int _life;
+	int _score;
+	int _ballsLeft;
 
 	float _height;
+	float _width;
 
 	void launchBall();
 };

@@ -9,7 +9,15 @@ public:
 
 private:
 	sf::CircleShape _shape;
+	sf::Texture _texture;
 	sf::Vector2f _velocity;
+
+	float getLeftSide() const { return _shape.getPosition().x - _shape.getRadius(); }
+	float getRightSide() const { return _shape.getPosition().x + _shape.getRadius(); }
+	float getTopSide() const { return _shape.getPosition().y - _shape.getRadius(); }
+	float getBottomSide() const { return _shape.getPosition().y + _shape.getRadius(); }
+
+	void moveOutOfBounds(const sf::Shape& bounds);
 
 public:
 	void SetPosition(const sf::Vector2f& position) { _shape.setPosition(position); }

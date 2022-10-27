@@ -35,6 +35,21 @@ void Bar::MoveRight(const sf::Time elapsed)
 	_isMoving = true;
 }
 
+void Bar::Stop(const sf::RectangleShape& wall)
+{
+	if (_velocity > 0)
+	{
+		_shape.move(wall.getPosition().x - _shape.getPosition().x - _shape.getSize().x, 0);
+	}
+	else
+	{
+		_shape.move(wall.getPosition().x - _shape.getPosition().x + wall.getSize().x, 0);
+	}
+
+	_velocity = 0.0f;
+	_isMoving = false;
+}
+
 void Bar::Update(const sf::Time elapsed)
 {
 	if (_velocity != 0.0f)
@@ -43,9 +58,9 @@ void Bar::Update(const sf::Time elapsed)
 		
 		if (!_isMoving)
 		{
-			_velocity += _velocity * - 2.0f * elapsed.asSeconds();
+			_velocity += _velocity * - 4.0f * elapsed.asSeconds();
 
-			if (abs(_velocity) < 1.0f)
+			if (abs(_velocity) < 40.0f)
 			{
 				_velocity = 0.0f;
 			}
