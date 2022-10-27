@@ -1,6 +1,9 @@
 #pragma once
 #include "Player.h"
+#include "Spark.h"
 #include "SFML/Graphics.hpp"
+
+const sf::Time SPARK_COOLDOWN = sf::seconds(0.01f);
 
 class Ball final : public sf::Drawable
 {
@@ -11,6 +14,9 @@ private:
 	sf::CircleShape _shape;
 	sf::Texture _texture;
 	sf::Vector2f _velocity;
+	std::vector<Spark> _sparks;
+
+	sf::Time _sparkCooldown;
 
 	float getLeftSide() const { return _shape.getPosition().x - _shape.getRadius(); }
 	float getRightSide() const { return _shape.getPosition().x + _shape.getRadius(); }

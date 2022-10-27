@@ -45,7 +45,10 @@ void GameController::Update(const sf::Time elapsed)
 		_player.ResetDirection();
 	}
 
-	_player.Update(elapsed);
+	if (_life != 0)
+	{
+		_player.Update(elapsed);
+	}
 
 	for (auto& wall : _walls)
 	{
@@ -86,14 +89,18 @@ void GameController::Update(const sf::Time elapsed)
 	// Delete balls that are out of the screen
 	_balls.erase(std::remove_if(_balls.begin(), _balls.end(), [this](const Ball& ball)
 	{
-		return ball.GetPosition().y > _height;
+			return ball.GetPosition().y > _height * 1.5f;
 	}), _balls.end());
 
-	if (_balls.empty())
+	if (_balls.empty() && _life != 0)
 	{
 		_life--;
-		_ballsLeft = 3;
-		_balls.emplace_back(Ball());
+
+		if (_life != 0)
+		{
+			_ballsLeft = 3;
+			_balls.emplace_back(Ball());
+		}
 	}
 }
 
@@ -129,6 +136,20 @@ void GameController::Draw(sf::RenderWindow& window) const
 	lifeText.setPosition(_width - lifeText.getGlobalBounds().width - 10, 1);
 
 	window.draw(lifeText);
+
+	if (_life == 0)
+	{
+		sf::Text gameOverText;
+		gameOverText.setFont(_font);
+		gameOverText.setCharacterSize(30);
+		gameOverText.setFillColor(sf::Color::Black);
+		gameOverText.setOutlineColor(sf::Color::White);
+		gameOverText.setOutlineThickness(2);
+		gameOverText.setString("GAME OVER");
+		gameOverText.setPosition(_width / 2 - gameOverText.getGlobalBounds().width / 2, _height / 2 - gameOverText.getGlobalBounds().height / 2);
+
+		window.draw(gameOverText);
+	}
 }
 
 void GameController::CheckInput(const sf::Event event)

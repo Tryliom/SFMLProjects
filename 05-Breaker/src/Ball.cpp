@@ -1,4 +1,5 @@
 #include "Ball.h"
+#include "Random.h"
 
 Ball::Ball()
 {
@@ -7,6 +8,8 @@ Ball::Ball()
 	_shape.setOrigin(_shape.getRadius(), _shape.getRadius());
 
 	_velocity = { 0, 0 };
+
+	_sparks = {};
 }
 
 void Ball::moveOutOfBounds(const sf::Shape& bounds)
@@ -49,6 +52,36 @@ void Ball::Update(const sf::Time elapsed)
 {
 	_shape.move(_velocity * elapsed.asSeconds());
 	_shape.setTexture(&_texture);
+
+	_sparkCooldown -= elapsed;
+
+	if (_sparkCooldown <= sf::Time::Zero)
+	{
+		_sparkCooldown = SPARK_COOLDOWN;
+		_sparks.emplace_back(Spark(
+			sf::Vector2f(
+				Random::GetFloat(_shape.getPosition().x - _shape.getRadius(), _shape.getPosition().x + _shape.getRadius()),
+				Random::GetFloat(_shape.getPosition().y - _shape.getRadius(), _shape.getPosition().y + _shape.getRadius())
+			),
+			(_velocity / -10.0f) + sf::Vector2f{ Random::GetFloat(-3.0f, 3.0f), Random::GetFloat(-3.0f, 3.0f) },
+			sf::Color(180 + Random::GetInt(0, 70), 155, 30),
+			sf::Time(sf::seconds(Random::GetFloat(0.3f, 0.8f)))
+		));
+	}
+
+	for (auto& spark : _sparks)
+	{
+		spark.Update(elapsed);
+	}
+
+	_sparks.erase(
+		std::remove_if(
+			_sparks.begin(),
+			_sparks.end(),
+			[](const Spark& spark) { return !spark.IsAlive(); }
+		),
+		_sparks.end()
+	);
 }
 
 bool Ball::IsColliding(const sf::Shape& bounds) const
@@ -127,13 +160,17 @@ void Ball::Reset()
 
 void Ball::draw(sf::RenderTarget& target, const sf::RenderStates states) const
 {
-	target.draw(_shape, states);
-
 	sf::CircleShape shadow;
 	shadow.setRadius(_shape.getRadius());
 	shadow.setOrigin(_shape.getRadius(), _shape.getRadius());
-	shadow.setPosition(_shape.getPosition().x + 3, _shape.getPosition().y + 3);
+	shadow.setPosition(_shape.getPosition().x + 2, _shape.getPosition().y + 2);
 	shadow.setFillColor(sf::Color(0, 0, 0, 100));
 
+	for (const auto& spark : _sparks)
+	{
+		target.draw(spark, states);
+	}
+
 	target.draw(shadow, states);
+	target.draw(_shape, states);
 }
