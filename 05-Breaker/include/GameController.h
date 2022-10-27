@@ -3,6 +3,8 @@
 #include "Ball.h"
 #include "Brick.h"
 
+#include "SFML/Audio.hpp"
+
 class GameController final
 {
 public:
@@ -21,6 +23,8 @@ private:
 	sf::RectangleShape _background;
 	sf::Texture _backgroundTexture;
 	sf::Font _font;
+	sf::Music _music;
+	sf::Sound _hitSound;
 
 	int _life;
 	int _score;
@@ -31,4 +35,5 @@ private:
 
 	void launchBall();
 	void createBricks();
+	void createWalls(sf::RenderWindow& window);
 };

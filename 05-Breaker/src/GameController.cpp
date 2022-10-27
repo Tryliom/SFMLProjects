@@ -5,19 +5,6 @@
 GameController::GameController(sf::RenderWindow& window)
 	: _player( sf::Vector2f( window.getSize().x / 2, window.getSize().y - 50 ) )
 {
-	// Create wall around the screen
-	_walls.emplace_back(sf::RectangleShape(sf::Vector2f(window.getSize().x, 14)));
-	_walls.back().setPosition(0, 0);
-	_walls.back().setFillColor(sf::Color::White);
-
-	_walls.emplace_back(sf::RectangleShape(sf::Vector2f(10, window.getSize().y)));
-	_walls.back().setPosition(0, 0);
-	_walls.back().setFillColor(sf::Color::White);
-
-	_walls.emplace_back(sf::RectangleShape(sf::Vector2f(10, window.getSize().y)));
-	_walls.back().setPosition(window.getSize().x - 10, 0);
-	_walls.back().setFillColor(sf::Color::White);
-
 	_width = static_cast<float>(window.getSize().x);
 	_height = static_cast<float>(window.getSize().y);
 	_life = 3;
@@ -32,6 +19,21 @@ GameController::GameController(sf::RenderWindow& window)
 	_font.loadFromFile("data/font/pixelmix.ttf");
 
 	createBricks();
+	createWalls(window);
+
+	// Play random music
+	const int music = Random::GetInt(0, 1);
+
+	if (music == 0)
+	{
+		_music.openFromFile("data/sound/main_theme1.wav");
+	}
+	else
+	{
+		_music.openFromFile("data/sound/main_theme2.wav");
+	}
+
+	_music.play();
 }
 
 void GameController::Update(const sf::Time elapsed)
@@ -147,19 +149,19 @@ void GameController::Draw(sf::RenderWindow& window) const
 
 	sf::Text scoreText;
 	scoreText.setFont(_font);
-	scoreText.setCharacterSize(12);
-	scoreText.setFillColor(sf::Color::Black);
-	scoreText.setPosition(10, 1);
+	scoreText.setCharacterSize(16);
+	scoreText.setFillColor(sf::Color::White);
+	scoreText.setPosition(10, 4);
 	scoreText.setString(std::to_string(_score) + " pts");
 
 	window.draw(scoreText);
 
 	sf::Text lifeText;
 	lifeText.setFont(_font);
-	lifeText.setCharacterSize(12);
-	lifeText.setFillColor(sf::Color::Black);
+	lifeText.setCharacterSize(16);
+	lifeText.setFillColor(sf::Color::White);
 	lifeText.setString("Life: " + std::to_string(_life));
-	lifeText.setPosition(_width - lifeText.getGlobalBounds().width - 10, 1);
+	lifeText.setPosition(_width - lifeText.getGlobalBounds().width - 10, 4);
 
 	window.draw(lifeText);
 
@@ -210,9 +212,9 @@ void GameController::launchBall()
 
 void GameController::createBricks()
 {
-	const int nbBrickOnWidth = static_cast<int>((_width - 2 * 20) / BRICK_WIDTH);
-	const int nbBrickOnHeight = static_cast<int>((_height - 2 * 20) / 3 / BRICK_HEIGHT);
-	const float brickMargin = ((_width - 2 * 20) - nbBrickOnWidth * BRICK_WIDTH) / (nbBrickOnWidth - 1);
+	const int nbBrickOnWidth = static_cast<int>((_width - 2 * 30) / BRICK_WIDTH);
+	const int nbBrickOnHeight = static_cast<int>(_height / 3 / BRICK_HEIGHT);
+	const float brickMargin = ((_width - 2 * 30) - nbBrickOnWidth * BRICK_WIDTH) / (nbBrickOnWidth - 1);
 
 	// Create bricks
 	for (int w = 0; w < nbBrickOnWidth; w++)
@@ -220,9 +222,27 @@ void GameController::createBricks()
 		for (int h = 0; h < nbBrickOnHeight; h++)
 		{
 			_bricks.emplace_back(Brick(sf::Vector2f(
-				20.0f + (BRICK_WIDTH + brickMargin) * w,
-				20.0f + BRICK_HEIGHT * h
+				30.0f + (BRICK_WIDTH + brickMargin) * w,
+				80.0f + (BRICK_HEIGHT + brickMargin) * h
 			)));
 		}
 	}
+}
+
+void GameController::createWalls(sf::RenderWindow& window)
+{
+	const sf::Color wallColor = sf::Color(0, 0, 0, 200);
+
+	// Create wall around the screen
+	_walls.emplace_back(sf::RectangleShape(sf::Vector2f(window.getSize().x, 24)));
+	_walls.back().setPosition(0, 0);
+	_walls.back().setFillColor(wallColor);
+
+	_walls.emplace_back(sf::RectangleShape(sf::Vector2f(10, window.getSize().y)));
+	_walls.back().setPosition(0, 24);
+	_walls.back().setFillColor(wallColor);
+
+	_walls.emplace_back(sf::RectangleShape(sf::Vector2f(10, window.getSize().y)));
+	_walls.back().setPosition(window.getSize().x - 10, 24);
+	_walls.back().setFillColor(wallColor);
 }

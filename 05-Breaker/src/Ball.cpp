@@ -65,7 +65,7 @@ void Ball::Update(const sf::Time elapsed)
 				Random::GetFloat(_shape.getPosition().x - _shape.getRadius(), _shape.getPosition().x + _shape.getRadius()),
 				Random::GetFloat(_shape.getPosition().y - _shape.getRadius(), _shape.getPosition().y + _shape.getRadius())
 			),
-			(_velocity / -20.0f) + sf::Vector2f{ Random::GetFloat(- spawnArea, spawnArea), Random::GetFloat(- spawnArea, spawnArea) },
+			(_velocity / -5.0f) + sf::Vector2f{ Random::GetFloat(- spawnArea, spawnArea), Random::GetFloat(- spawnArea, spawnArea) },
 			sf::Color(180 + Random::GetInt(0, 70), 155, 30),
 			sf::Time(sf::seconds(Random::GetFloat(0.2f, 0.5f)))
 		));
