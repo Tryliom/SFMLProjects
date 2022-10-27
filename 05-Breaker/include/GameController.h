@@ -1,6 +1,7 @@
 #pragma once
 #include "Player.h"
 #include "Ball.h"
+#include "Brick.h"
 
 class GameController final
 {
@@ -15,6 +16,7 @@ private:
 	Player _player;
 	std::vector<Ball> _balls;
 	std::vector<sf::RectangleShape> _walls;
+	std::vector<Brick> _bricks;
 
 	sf::RectangleShape _background;
 	sf::Texture _backgroundTexture;
@@ -28,4 +30,5 @@ private:
 	float _width;
 
 	void launchBall();
+	void createBricks();
 };

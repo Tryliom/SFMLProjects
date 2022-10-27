@@ -19,7 +19,14 @@ void Bar::MoveLeft(const sf::Time elapsed)
 {
 	if (abs(_velocity) < MAX_SPEED)
 	{
-		_velocity -= SPEED * elapsed.asSeconds();
+		float increase = SPEED * elapsed.asSeconds();
+
+		if (_velocity > 0)
+		{
+			increase *= 5;
+		}
+
+		_velocity -= increase;
 	}
 
 	_isMoving = true;
@@ -29,7 +36,14 @@ void Bar::MoveRight(const sf::Time elapsed)
 {
 	if (abs(_velocity) < MAX_SPEED)
 	{
-		_velocity += SPEED * elapsed.asSeconds();
+		float increase = SPEED * elapsed.asSeconds();
+
+		if (_velocity < 0)
+		{
+			increase *= 5;
+		}
+
+		_velocity += increase;
 	}
 
 	_isMoving = true;

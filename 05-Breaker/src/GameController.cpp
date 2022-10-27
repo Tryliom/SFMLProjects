@@ -1,5 +1,7 @@
 #include "GameController.h"
 
+#include "Random.h"
+
 GameController::GameController(sf::RenderWindow& window)
 	: _player( sf::Vector2f( window.getSize().x / 2, window.getSize().y - 50 ) )
 {
@@ -21,13 +23,15 @@ GameController::GameController(sf::RenderWindow& window)
 	_life = 3;
 	_score = 0;
 	_ballsLeft = 3;
-	_balls.emplace_back(Ball());
+	_balls.emplace_back();
 
 	_backgroundTexture.loadFromFile("data/textures/background.png");
 	_background.setSize(sf::Vector2f(_width, _height));
 	_background.setTexture(&_backgroundTexture);
 
 	_font.loadFromFile("data/font/pixelmix.ttf");
+
+	createBricks();
 }
 
 void GameController::Update(const sf::Time elapsed)
@@ -79,6 +83,16 @@ void GameController::Update(const sf::Time elapsed)
 					ball.Bounce(wall);
 				}
 			}
+
+			for (auto& brick : _bricks)
+			{
+				if (ball.IsColliding(brick.GetShape()))
+				{
+					ball.Bounce(brick.GetShape());
+					brick.Break();
+					_score += 10;
+				}
+			}
 		}
 		else
 		{
@@ -99,9 +113,16 @@ void GameController::Update(const sf::Time elapsed)
 		if (_life != 0)
 		{
 			_ballsLeft = 3;
-			_balls.emplace_back(Ball());
+			_balls.emplace_back();
 		}
 	}
+
+	// Delete bricks that are broken
+	_bricks.erase(std::remove_if(_bricks.begin(), _bricks.end(), [](const Brick& brick)
+		{
+			return brick.IsDestroyed();
+		}
+	), _bricks.end());
 }
 
 void GameController::Draw(sf::RenderWindow& window) const
@@ -117,6 +138,11 @@ void GameController::Draw(sf::RenderWindow& window) const
 	for (const auto& wall : _walls)
 	{
 		window.draw(wall);
+	}
+
+	for (const auto& brick : _bricks)
+	{
+		window.draw(brick);
 	}
 
 	sf::Text scoreText;
@@ -174,10 +200,29 @@ void GameController::launchBall()
 
 			if (_ballsLeft > 0)
 			{
-				_balls.emplace_back(Ball());
+				_balls.emplace_back();
 			}
 
 			break;
+		}
+	}
+}
+
+void GameController::createBricks()
+{
+	const int nbBrickOnWidth = static_cast<int>((_width - 2 * 20) / BRICK_WIDTH);
+	const int nbBrickOnHeight = static_cast<int>((_height - 2 * 20) / 3 / BRICK_HEIGHT);
+	const float brickMargin = ((_width - 2 * 20) - nbBrickOnWidth * BRICK_WIDTH) / (nbBrickOnWidth - 1);
+
+	// Create bricks
+	for (int w = 0; w < nbBrickOnWidth; w++)
+	{
+		for (int h = 0; h < nbBrickOnHeight; h++)
+		{
+			_bricks.emplace_back(Brick(sf::Vector2f(
+				20.0f + (BRICK_WIDTH + brickMargin) * w,
+				20.0f + BRICK_HEIGHT * h
+			)));
 		}
 	}
 }

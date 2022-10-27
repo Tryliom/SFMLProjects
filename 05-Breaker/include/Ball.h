@@ -4,6 +4,7 @@
 #include "SFML/Graphics.hpp"
 
 const sf::Time SPARK_COOLDOWN = sf::seconds(0.01f);
+constexpr float MAX_Y_VELOCITY = 600.0f;
 
 class Ball final : public sf::Drawable
 {

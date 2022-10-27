@@ -55,17 +55,19 @@ void Ball::Update(const sf::Time elapsed)
 
 	_sparkCooldown -= elapsed;
 
-	if (_sparkCooldown <= sf::Time::Zero)
+	if (_sparkCooldown <= sf::Time::Zero && IsMoving())
 	{
+		const float spawnArea = _shape.getRadius() / 2.0f + 2.0f;
+
 		_sparkCooldown = SPARK_COOLDOWN;
 		_sparks.emplace_back(Spark(
 			sf::Vector2f(
 				Random::GetFloat(_shape.getPosition().x - _shape.getRadius(), _shape.getPosition().x + _shape.getRadius()),
 				Random::GetFloat(_shape.getPosition().y - _shape.getRadius(), _shape.getPosition().y + _shape.getRadius())
 			),
-			(_velocity / -10.0f) + sf::Vector2f{ Random::GetFloat(-3.0f, 3.0f), Random::GetFloat(-3.0f, 3.0f) },
+			(_velocity / -20.0f) + sf::Vector2f{ Random::GetFloat(- spawnArea, spawnArea), Random::GetFloat(- spawnArea, spawnArea) },
 			sf::Color(180 + Random::GetInt(0, 70), 155, 30),
-			sf::Time(sf::seconds(Random::GetFloat(0.3f, 0.8f)))
+			sf::Time(sf::seconds(Random::GetFloat(0.2f, 0.5f)))
 		));
 	}
 
@@ -142,7 +144,10 @@ void Ball::Bounce(const Bar& bar)
 		_velocity.y = -std::abs(_velocity.y);
 
 		// Increase the speed of the ball every hit
-		_velocity.y *= 1.05f;
+		if (abs(_velocity.y) < MAX_Y_VELOCITY)
+		{
+			_velocity.y *= 1.05f;
+		}
 	}
 
 	moveOutOfBounds(bar.GetBar());

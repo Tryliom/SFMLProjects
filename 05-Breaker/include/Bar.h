@@ -1,7 +1,7 @@
 #pragma once
 #include "SFML/Graphics.hpp"
 
-constexpr float SPEED = 500.0f;
+constexpr float SPEED = 800.0f;
 constexpr float MAX_SPEED = 1000.0f;
 
 class Bar final : public sf::Drawable

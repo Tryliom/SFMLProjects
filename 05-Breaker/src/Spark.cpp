@@ -6,6 +6,7 @@ Spark::Spark(const sf::Vector2f& position, const sf::Vector2f& direction, const 
 	_shape.setSize({ 5.0f, 5.0f });
 	_shape.setPosition(position);
 	_shape.setFillColor(color);
+	_shape.setOrigin(_shape.getSize() / 2.0f);
 
 	_velocity = direction;
 	_lifetime = lifetime;
