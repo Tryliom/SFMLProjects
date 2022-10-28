@@ -53,10 +53,11 @@ void Ball::spawnSparks()
 	const sf::Vector2f position = _shape.getPosition();
 	const float radius = _shape.getRadius();
 	constexpr int offset = 5;
+	const int size = static_cast<int>(radius / 2) + offset;
 
-	for (int i = -offset - radius / 2; i < radius / 2 + offset; i++)
+	for (int i = -size; i < size; i++)
 	{
-		for (int j = -offset - radius / 2; j < radius / 2 + offset; j++)
+		for (int j = -size; j < size; j++)
 		{
 			// Ignore sparks outside the circle + offset
 			if (abs(i * i + j * j) > radius * radius + offset * offset)
@@ -67,21 +68,21 @@ void Ball::spawnSparks()
 			auto color = sf::Color(199, 67, 47);
 
 			// Make the sparks a different color if they are on the edge of the circle and in the direction of the velocity
-			/*if (abs(i * i + j * j) > (radius - offset) * (radius - offset) || (i * _velocity.x < 0 && j * _velocity.y < 0))
+			if (abs(i * i + j * j) > (radius - offset) * (radius - offset) || (i * _velocity.x < 0 && j * _velocity.y < 0))
 			{
 				if (i * _velocity.x > 0 || j * _velocity.y > 0)
 				{
-					color = sf::Color(206, 77, 58);
+					color = sf::Color(206, 86, 42);
 				}
-			}*/
+			}
 
 			auto sparkPosition = sf::Vector2f(position.x + i, position.y + j);
 
 			_sparks.emplace_back(Spark(
 				sparkPosition,
-				(position - sparkPosition) / 3.0f,
+				(position - sparkPosition) * Random::GetFloat(1.0f, 6.0f),
 				color,
-				sf::Time(sf::seconds(0.8f))
+				sf::Time(sf::seconds(Random::GetFloat(0.05f, 0.125f)))
 			));
 		}
 	}
@@ -205,17 +206,10 @@ void Ball::Reset()
 
 void Ball::draw(sf::RenderTarget& target, const sf::RenderStates states) const
 {
-	sf::CircleShape shadow;
-	shadow.setRadius(_shape.getRadius());
-	shadow.setOrigin(_shape.getRadius(), _shape.getRadius());
-	shadow.setPosition(_shape.getPosition().x + 2, _shape.getPosition().y + 2);
-	shadow.setFillColor(sf::Color(0, 0, 0, 100));
-
 	for (const auto& spark : _sparks)
 	{
 		target.draw(spark, states);
 	}
-
-	target.draw(shadow, states);
+	
 	target.draw(_shape, states);
 }
