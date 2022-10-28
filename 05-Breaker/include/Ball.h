@@ -5,6 +5,7 @@
 
 const sf::Time SPARK_COOLDOWN = sf::seconds(0.01f);
 constexpr float MAX_Y_VELOCITY = 600.0f;
+constexpr float MAX_X_VELOCITY = 300.0f;
 
 class Ball final : public sf::Drawable
 {
@@ -26,6 +27,9 @@ private:
 
 	void moveOutOfBounds(const sf::Shape& bounds);
 
+	void spawnSparks();
+	void onBounce(const sf::Shape& shape);
+
 public:
 	void SetPosition(const sf::Vector2f& position) { _shape.setPosition(position); }
 	sf::Vector2f GetPosition() const { return _shape.getPosition(); }
@@ -35,7 +39,7 @@ public:
 	void Update(sf::Time elapsed);
 	bool IsColliding(const sf::Shape& bounds) const;
 	void Bounce(const sf::Shape& bounds);
-	void Bounce(const Bar& bar);
+	void Bounce(Bar& bar);
 	void Launch(const sf::Vector2f& direction);
 	void Reset();
 

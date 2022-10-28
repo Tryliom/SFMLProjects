@@ -7,7 +7,7 @@ public:
 	Spark(const sf::Vector2f& position, const sf::Vector2f& direction, const sf::Color& color, const sf::Time& lifetime);
 
 private:
-	sf::RectangleShape _shape;
+	sf::CircleShape _shape;
 	sf::Vector2f _velocity;
 	sf::Time _lifetime;
 	sf::Time _elapsed;

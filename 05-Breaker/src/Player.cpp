@@ -10,9 +10,9 @@ sf::Vector2f Player::GetBallPosition() const
 	return _bars[0].GetTopMiddlePosition();
 }
 
-bool Player::IsColliding(const sf::Shape& bounds) const
+bool Player::IsColliding(const sf::Shape& bounds)
 {
-	for (const auto& bar : _bars)
+	for (auto& bar : _bars)
 	{
 		if (bar.GetBar().getGlobalBounds().intersects(bounds.getGlobalBounds()))
 		{
@@ -44,6 +44,14 @@ void Player::ResetDirection()
 	for (auto& bar : _bars)
 	{
 		bar.ResetDirection();
+	}
+}
+
+void Player::SetPosition(const int x)
+{
+	for (auto& bar : _bars)
+	{
+		bar.GetBar().setPosition(static_cast<float>(x), bar.GetBar().getPosition().y);
 	}
 }
 

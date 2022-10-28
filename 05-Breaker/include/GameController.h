@@ -36,4 +36,5 @@ private:
 	void launchBall();
 	void createBricks();
 	void createWalls(sf::RenderWindow& window);
+	void onBounce(sf::Drawable& object);
 };

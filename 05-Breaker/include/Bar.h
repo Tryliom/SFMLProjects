@@ -21,7 +21,7 @@ private:
 	float getBottomSide() const { return _shape.getPosition().y + _shape.getSize().y; }
 
 public:
-	sf::RectangleShape GetBar() const { return _shape; }
+	sf::RectangleShape& GetBar() { return _shape; }
 	float GetVelocity() const { return _velocity; }
 	sf::Vector2f GetTopMiddlePosition() const;
 	void ResetDirection() { _isMoving = false; }

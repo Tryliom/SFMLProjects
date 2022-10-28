@@ -2,9 +2,12 @@
 
 int main()
 {
-	sf::RenderWindow window{ sf::VideoMode{ 416, 608 }, "Breaker", sf::Style::Close };
+	sf::RenderWindow window{ sf::VideoMode{ 624, 912 }, "Breaker", sf::Style::Close };
 	GameController gameController(window);
 	sf::Clock clock;
+
+	window.setVerticalSyncEnabled(true);
+	window.setFramerateLimit(144);
 
 	while (window.isOpen())
 	{

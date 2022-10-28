@@ -1,5 +1,7 @@
 #include "GameController.h"
 
+#include <iostream>
+
 #include "Random.h"
 
 GameController::GameController(sf::RenderWindow& window)
@@ -21,19 +23,8 @@ GameController::GameController(sf::RenderWindow& window)
 	createBricks();
 	createWalls(window);
 
-	// Play random music
-	const int music = Random::GetInt(0, 1);
-
-	if (music == 0)
-	{
-		_music.openFromFile("data/sound/main_theme1.wav");
-	}
-	else
-	{
-		_music.openFromFile("data/sound/main_theme2.wav");
-	}
-
-	_music.play();
+	/*_music.openFromFile("data/sound/main_theme.wav");
+	_music.play();*/
 }
 
 void GameController::Update(const sf::Time elapsed)
@@ -75,6 +66,7 @@ void GameController::Update(const sf::Time elapsed)
 				if (ball.IsColliding(bar.GetBar()))
 				{
 					ball.Bounce(bar);
+					onBounce(bar);
 				}
 			}
 
@@ -83,6 +75,7 @@ void GameController::Update(const sf::Time elapsed)
 				if (ball.IsColliding(wall))
 				{
 					ball.Bounce(wall);
+					//onBounce(wall);
 				}
 			}
 
@@ -91,6 +84,7 @@ void GameController::Update(const sf::Time elapsed)
 				if (ball.IsColliding(brick.GetShape()))
 				{
 					ball.Bounce(brick.GetShape());
+					onBounce(brick);
 					brick.Break();
 					_score += 10;
 				}
@@ -189,6 +183,32 @@ void GameController::CheckInput(const sf::Event event)
 			launchBall();
 		}
 	}
+
+	if (event.type == sf::Event::MouseButtonPressed)
+	{
+		if (event.mouseButton.button == sf::Mouse::Left)
+		{
+			launchBall();
+		}
+	}
+
+	if (event.type == sf::Event::MouseMoved)
+	{
+		// Update player with the mouse position
+		const float size = _player.GetBars()[0].GetBar().getSize().x / 2;
+		int x = event.mouseMove.x;
+
+		if (x < 0)
+		{
+			x = 0;
+		}
+		else if (x + size > _width)
+		{
+			x = _width - size;
+		}
+		
+		_player.SetPosition(x - size);
+	}
 }
 
 void GameController::launchBall()
@@ -197,7 +217,14 @@ void GameController::launchBall()
 	{
 		if (!ball.IsMoving())
 		{
-			ball.Launch(sf::Vector2f(_player.GetVelocity(), -200.0f));
+			float velocity = _player.GetVelocity();
+
+			if (velocity == 0.0f)
+			{
+				velocity = Random::GetFloat(120.0f, 200.0f);
+			}
+
+			ball.Launch(sf::Vector2f(velocity, -200.0f));
 			_ballsLeft--;
 
 			if (_ballsLeft > 0)
@@ -234,15 +261,20 @@ void GameController::createWalls(sf::RenderWindow& window)
 	const sf::Color wallColor = sf::Color(0, 0, 0, 200);
 
 	// Create wall around the screen
-	_walls.emplace_back(sf::RectangleShape(sf::Vector2f(window.getSize().x, 24)));
-	_walls.back().setPosition(0, 0);
+	_walls.emplace_back(sf::RectangleShape(sf::Vector2f(window.getSize().x + 100, 24 + 50)));
+	_walls.back().setPosition(-50, -50);
 	_walls.back().setFillColor(wallColor);
 
-	_walls.emplace_back(sf::RectangleShape(sf::Vector2f(10, window.getSize().y)));
-	_walls.back().setPosition(0, 24);
-	_walls.back().setFillColor(wallColor);
+	_walls.emplace_back(sf::RectangleShape(sf::Vector2f(20, window.getSize().y)));
+	_walls.back().setPosition(-20, 24);
+	_walls.back().setFillColor(sf::Color::Transparent);
 
-	_walls.emplace_back(sf::RectangleShape(sf::Vector2f(10, window.getSize().y)));
-	_walls.back().setPosition(window.getSize().x - 10, 24);
-	_walls.back().setFillColor(wallColor);
+	_walls.emplace_back(sf::RectangleShape(sf::Vector2f(20, window.getSize().y)));
+	_walls.back().setPosition(window.getSize().x, 24);
+	_walls.back().setFillColor(sf::Color::Transparent);
+}
+
+void GameController::onBounce(sf::Drawable& object)
+{
+	//TODO: Play sounds and display effect when ball bounce on an object, depending on the object
 }
