@@ -2,14 +2,14 @@
 
 #include <iostream>
 
+#include "Assets.h"
+
 Bar::Bar(const sf::Vector2f position)
 {
-	if (!_texture.loadFromFile("data/textures/bar.png"))
-		std::cout << "Error loading bar.png" << std::endl;
-
-	_shape.setTexture(&_texture);
+	const auto& texture = Assets::GetInstance().GetTexture(Asset::BAR);
+	_shape.setTexture(&texture);
 	_shape.setPosition(position);
-	_shape.setSize({static_cast<float>(_texture.getSize().x), static_cast<float>(_texture.getSize().y)});
+	_shape.setSize({static_cast<float>(texture.getSize().x), static_cast<float>(texture.getSize().y)});
 
 	_velocity = 0.0f;
 	_isMoving = false;

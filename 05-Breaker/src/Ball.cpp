@@ -1,10 +1,13 @@
 #include "Ball.h"
+
+#include "Assets.h"
 #include "Random.h"
 
 Ball::Ball()
 {
-	_texture.loadFromFile("data/textures/ball.png");
-	_shape.setRadius(static_cast<float>(_texture.getSize().x) / 2.0f);
+	const auto& texture = Assets::GetInstance().GetTexture(Asset::BALL);
+	_shape.setTexture(&texture);
+	_shape.setRadius(static_cast<float>(texture.getSize().x) / 2.0f);
 	_shape.setOrigin(_shape.getRadius(), _shape.getRadius());
 
 	_velocity = { 0, 0 };
@@ -96,7 +99,6 @@ void Ball::onBounce(const sf::Shape& shape)
 void Ball::Update(const sf::Time elapsed)
 {
 	_shape.move(_velocity * elapsed.asSeconds());
-	_shape.setTexture(&_texture);
 
 	_sparkCooldown -= elapsed;
 
@@ -133,14 +135,8 @@ void Ball::Bounce(const sf::Shape& bounds)
 {
 	const sf::FloatRect bound = bounds.getGlobalBounds();
 
-	const float xBound = bounds.getPosition().x;
-	const float yBound = bounds.getPosition().y;
-	const float widthBound = bound.width;
-	const float heightBound = bound.height;
-
 	const float x = _shape.getPosition().x;
 	const float y = _shape.getPosition().y;
-	const float radius = _shape.getRadius();
 
 	// Check if the ball is colliding with any side of the bounds
 	if (bound.contains(getLeftSide(), y))

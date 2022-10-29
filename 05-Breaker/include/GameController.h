@@ -21,7 +21,6 @@ private:
 	std::vector<Brick> _bricks;
 
 	sf::RectangleShape _background;
-	sf::Texture _backgroundTexture;
 	sf::Font _font;
 	sf::Music _music;
 	sf::Sound _hitSound;

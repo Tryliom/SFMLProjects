@@ -10,7 +10,6 @@ public:
 	explicit Bar(sf::Vector2f position);
 
 private:
-	sf::Texture _texture;
 	sf::RectangleShape _shape;
 	float _velocity;
 	bool _isMoving;

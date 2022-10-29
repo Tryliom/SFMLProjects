@@ -1,7 +1,9 @@
 #include "GameController.h"
+#include "Assets.h"
 
 int main()
 {
+	Assets::GetInstance();
 	sf::RenderWindow window{ sf::VideoMode{ 624, 912 }, "Breaker", sf::Style::Close };
 	GameController gameController(window);
 	sf::Clock clock;

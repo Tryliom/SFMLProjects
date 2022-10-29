@@ -1,5 +1,6 @@
 # TODO
 
+0. Make assets
 1. Add effects on bounce with sparks
 2. Make better physics
 3. Add a way to load levels from a file

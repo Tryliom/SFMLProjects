@@ -1,7 +1,6 @@
 #include "GameController.h"
 
-#include <iostream>
-
+#include "Assets.h"
 #include "Random.h"
 
 GameController::GameController(sf::RenderWindow& window)
@@ -14,9 +13,9 @@ GameController::GameController(sf::RenderWindow& window)
 	_ballsLeft = 3;
 	_balls.emplace_back();
 
-	_backgroundTexture.loadFromFile("data/textures/background.png");
+	const auto& backgroundTexture = Assets::GetInstance().GetTexture(Asset::BACKGROUND);
 	_background.setSize(sf::Vector2f(_width, _height));
-	_background.setTexture(&_backgroundTexture);
+	_background.setTexture(&backgroundTexture);
 
 	_font.loadFromFile("data/font/pixelmix.ttf");
 

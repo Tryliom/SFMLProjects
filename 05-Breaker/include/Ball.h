@@ -14,7 +14,6 @@ public:
 
 private:
 	sf::CircleShape _shape;
-	sf::Texture _texture;
 	sf::Vector2f _velocity;
 	std::vector<Spark> _sparks;
 
