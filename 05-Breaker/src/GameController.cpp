@@ -118,6 +118,14 @@ void GameController::Update(const sf::Time elapsed)
 			return brick.IsDestroyed();
 		}
 	), _bricks.end());
+
+	if (_bricks.empty())
+	{
+		//_music.stop();
+		//_music.openFromFile("data/sound/win.wav");
+		//_music.play();
+		// Go to next level
+	}
 }
 
 void GameController::Draw(sf::RenderWindow& window) const
