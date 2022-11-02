@@ -210,7 +210,7 @@ void Ball::Bounce(Bar& bar)
 	// Always bounce the ball upwards
 	_velocity.y = -std::abs(_velocity.y);
 
-	moveOutOfBounds(bar.GetBar());
+	moveOutOfBounds(bar.GetBar(), Direction::DOWN);
 	onBounce(bar.GetBar());
 }
 

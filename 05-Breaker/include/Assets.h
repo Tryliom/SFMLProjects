@@ -1,6 +1,7 @@
 #pragma once
 #include <SFML/Audio/SoundBuffer.hpp>
 #include <SFML/Graphics/Texture.hpp>
+#include <array>
 
 enum class Asset
 {
@@ -17,10 +18,10 @@ class Assets
 private:
     Assets();
 
-    std::vector<sf::Texture> _textures;
-    std::vector<sf::SoundBuffer> _fx;
-public:
+	std::array<sf::Texture, 3> _textures;
+    std::array<sf::SoundBuffer, 3> _fx;
 
+public:
     Assets(const Assets&) = delete;
     Assets& operator=(const Assets&) = delete;
     Assets(Assets&&) = delete;

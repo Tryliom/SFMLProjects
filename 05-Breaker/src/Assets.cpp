@@ -2,24 +2,16 @@
 
 Assets::Assets()
 {
-	_textures.emplace_back();
-	_textures.back().loadFromFile("data/textures/background.png");
-	_textures.emplace_back();
-	_textures.back().loadFromFile("data/textures/bar.png");
-	_textures.emplace_back();
-	_textures.back().loadFromFile("data/textures/ball.png");
+	_textures[static_cast<int>(Asset::BACKGROUND)].loadFromFile("data/textures/background.png");
+	_textures[static_cast<int>(Asset::BAR)].loadFromFile("data/textures/bar.png");
+	_textures[static_cast<int>(Asset::BALL)].loadFromFile("data/textures/ball.png");
 
-	//_fx.emplace_back();
-	//_fx.back().loadFromFile("assets/sound/bounce.wav");
+	_fx[static_cast<int>(Audio::BOUNCE)].loadFromFile("data/sound/bounce.wav");
+	_fx[static_cast<int>(Audio::HIT)].loadFromFile("data/sound/hit.wav");
+	_fx[static_cast<int>(Audio::LOSE)].loadFromFile("data/sound/lose.wav");
 
-	//_fx.emplace_back();
-	//_fx.back().loadFromFile("assets/sound/hit.wav");
-
-	//_fx.emplace_back();
-	//_fx.back().loadFromFile("assets/sound/lose.wav");
-
-	//_fx.emplace_back();
-	//_fx.back().loadFromFile("assets/sound/win.wav");
+	/*_fx.emplace_back();
+	_fx.back().loadFromFile("data/sound/win.wav");*/
 }
 
 sf::Texture& Assets::GetTexture(Asset asset)

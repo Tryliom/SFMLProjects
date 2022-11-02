@@ -21,7 +21,7 @@ int main()
 			{
 				window.close();
 			}
-			gameController.CheckInput(event);
+			gameController.CheckInput(event, window);
 		}
 		
 		gameController.Update(clock.restart());
