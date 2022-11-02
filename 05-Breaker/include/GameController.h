@@ -5,6 +5,8 @@
 
 #include "SFML/Audio.hpp"
 
+enum class Audio;
+
 class GameController final
 {
 public:
@@ -17,13 +19,17 @@ public:
 private:
 	Player _player;
 	std::vector<Ball> _balls;
-	std::vector<sf::RectangleShape> _walls;
 	std::vector<Brick> _bricks;
+
+	// Walls
+	sf::RectangleShape _topWall;
+	sf::RectangleShape _leftWall;
+	sf::RectangleShape _rightWall;
 
 	sf::RectangleShape _background;
 	sf::Font _font;
 	sf::Music _music;
-	sf::Sound _hitSound;
+	sf::Sound _sounds;
 
 	int _life;
 	int _score;
@@ -34,6 +40,6 @@ private:
 
 	void launchBall();
 	void createBricks();
-	void createWalls(sf::RenderWindow& window);
-	void onBounce(sf::Drawable& object);
+	void createWalls(const sf::RenderWindow& window);
+	void playSound(Audio audio);
 };

@@ -9,8 +9,17 @@ Assets::Assets()
 	_textures.emplace_back();
 	_textures.back().loadFromFile("data/textures/ball.png");
 
-	_fx.emplace_back();
-	//_fx.back().loadFromFile("assets/main_theme.wav");
+	//_fx.emplace_back();
+	//_fx.back().loadFromFile("assets/sound/bounce.wav");
+
+	//_fx.emplace_back();
+	//_fx.back().loadFromFile("assets/sound/hit.wav");
+
+	//_fx.emplace_back();
+	//_fx.back().loadFromFile("assets/sound/lose.wav");
+
+	//_fx.emplace_back();
+	//_fx.back().loadFromFile("assets/sound/win.wav");
 }
 
 sf::Texture& Assets::GetTexture(Asset asset)

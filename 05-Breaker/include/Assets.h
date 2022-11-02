@@ -9,7 +9,7 @@ enum class Asset
 
 enum class Audio
 {
-    BOUNCE
+	BOUNCE, HIT, LOSE, WIN
 };
 
 class Assets

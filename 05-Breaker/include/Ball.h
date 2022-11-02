@@ -4,8 +4,13 @@
 #include "SFML/Graphics.hpp"
 
 const sf::Time SPARK_COOLDOWN = sf::seconds(0.01f);
-constexpr float MAX_Y_VELOCITY = 600.0f;
+constexpr float MAX_Y_VELOCITY = 700.0f;
 constexpr float MAX_X_VELOCITY = 300.0f;
+
+enum class Direction
+{
+	UP, DOWN, LEFT, RIGHT, NONE
+};
 
 class Ball final : public sf::Drawable
 {
@@ -24,7 +29,7 @@ private:
 	float getTopSide() const { return _shape.getPosition().y - _shape.getRadius(); }
 	float getBottomSide() const { return _shape.getPosition().y + _shape.getRadius(); }
 
-	void moveOutOfBounds(const sf::Shape& bounds);
+	void moveOutOfBounds(const sf::Shape& bounds, Direction direction = Direction::NONE);
 
 	void spawnSparks();
 	void onBounce(const sf::Shape& shape);
@@ -37,7 +42,7 @@ public:
 
 	void Update(sf::Time elapsed);
 	bool IsColliding(const sf::Shape& bounds) const;
-	void Bounce(const sf::Shape& bounds);
+	void Bounce(const sf::Shape& bounds, Direction direction = Direction::NONE);
 	void Bounce(Bar& bar);
 	void Launch(const sf::Vector2f& direction);
 	void Reset();

@@ -15,7 +15,7 @@ Ball::Ball()
 	_sparks = {};
 }
 
-void Ball::moveOutOfBounds(const sf::Shape& bounds)
+void Ball::moveOutOfBounds(const sf::Shape& bounds, Direction direction)
 {
 	const sf::FloatRect bound = bounds.getGlobalBounds();
 
@@ -28,26 +28,42 @@ void Ball::moveOutOfBounds(const sf::Shape& bounds)
 	const float y = _shape.getPosition().y;
 	const float radius = _shape.getRadius();
 
-	// Check if the ball is colliding with any side of the bounds
-	if (bound.contains(getLeftSide(), y))
+	if (direction == Direction::NONE)
 	{
-		// Move the ball to the edge of the bounds
-		_shape.setPosition(xBound + widthBound + radius, y);
+		// Check if the ball is colliding with any side of the bounds
+		if (bound.contains(getLeftSide(), y))
+		{
+			direction = Direction::LEFT;
+		}
+		else if (bound.contains(getRightSide(), y))
+		{
+			direction = Direction::RIGHT;
+		}
+		else if (bound.contains(x, getTopSide()))
+		{
+			direction = Direction::UP;
+		}
+		else if (bound.contains(x, getBottomSide()))
+		{
+			direction = Direction::DOWN;
+		}
 	}
-	else if (bound.contains(getRightSide(), y))
+
+	if (direction == Direction::UP)
 	{
-		// Move the ball to the edge of the bounds
-		_shape.setPosition(xBound - radius, y);
-	}
-	else if (bound.contains(x, getTopSide()))
-	{
-		// Move the ball to the edge of the bounds
 		_shape.setPosition(x, yBound + heightBound + radius);
 	}
-	else if (bound.contains(x, getBottomSide()))
+	else if (direction == Direction::DOWN)
 	{
-		// Move the ball to the edge of the bounds
 		_shape.setPosition(x, yBound - radius);
+	}
+	else if (direction == Direction::LEFT)
+	{
+		_shape.setPosition(xBound + widthBound + radius, y);
+	}
+	else if (direction == Direction::RIGHT)
+	{
+		_shape.setPosition(xBound - radius, y);
 	}
 }
 
@@ -94,6 +110,12 @@ void Ball::spawnSparks()
 void Ball::onBounce(const sf::Shape& shape)
 {
 	spawnSparks();
+
+	// Increase the speed of the ball every hit
+	if (abs(_velocity.y) < MAX_Y_VELOCITY)
+	{
+		_velocity.y += _velocity.y > 0 ? 3.0f : -3.0f;
+	}
 }
 
 void Ball::Update(const sf::Time elapsed)
@@ -131,36 +153,44 @@ bool Ball::IsColliding(const sf::Shape& bounds) const
 }
 
 
-void Ball::Bounce(const sf::Shape& bounds)
+void Ball::Bounce(const sf::Shape& bounds, Direction direction)
 {
 	const sf::FloatRect bound = bounds.getGlobalBounds();
 
 	const float x = _shape.getPosition().x;
 	const float y = _shape.getPosition().y;
 
-	// Check if the ball is colliding with any side of the bounds
-	if (bound.contains(getLeftSide(), y))
+	if (direction == Direction::NONE)
 	{
-		// Left side
-		_velocity.x = abs(_velocity.x);
-	}
-	else if (bound.contains(getRightSide(), y))
-	{
-		// Right side
-		_velocity.x = abs(_velocity.x) * -1;
-	}
-	else if (bound.contains(x, getTopSide()))
-	{
-		// Top side
-		_velocity.y = abs(_velocity.y);
-	}
-	else if (bound.contains(x, getBottomSide()))
-	{
-		// Bottom side
-		_velocity.y = abs(_velocity.y) * -1;
+		if (bound.contains(getLeftSide(), y))
+		{
+			direction = Direction::LEFT;
+		}
+		else if (bound.contains(getRightSide(), y))
+		{
+			direction = Direction::RIGHT;
+		}
+		else if (bound.contains(x, getTopSide()))
+		{
+			direction = Direction::UP;
+		}
+		else if (bound.contains(x, getBottomSide()))
+		{
+			direction = Direction::DOWN;
+		}
 	}
 
-	moveOutOfBounds(bounds);
+	// Bounce the ball off the bounds
+	if (direction == Direction::LEFT || direction == Direction::RIGHT)
+	{
+		_velocity.x = -_velocity.x;
+	}
+	else if (direction == Direction::UP || direction == Direction::DOWN)
+	{
+		_velocity.y = -_velocity.y;
+	}
+
+	moveOutOfBounds(bounds, direction);
 	onBounce(bounds);
 }
 
@@ -170,7 +200,7 @@ void Ball::Bounce(Bar& bar)
 	const float barCenter = bar.GetBar().getPosition().x + bar.GetBar().getSize().x / 2;
 	const float diff = (_shape.getPosition().x - barCenter) / (bar.GetBar().getSize().x / 2);
 
-	_velocity.x += diff * (abs(_velocity.x * 1.5f) + 5.0f) + bar.GetVelocity() / 10.0f;
+	_velocity.x += diff * (abs(_velocity.x * 1.5f) + 20.0f) + bar.GetVelocity() / 10.0f;
 
 	if (abs(_velocity.x) > MAX_X_VELOCITY)
 	{
@@ -179,12 +209,6 @@ void Ball::Bounce(Bar& bar)
 
 	// Always bounce the ball upwards
 	_velocity.y = -std::abs(_velocity.y);
-
-	// Increase the speed of the ball every hit
-	if (abs(_velocity.y) < MAX_Y_VELOCITY)
-	{
-		_velocity.y *= 1.05f;
-	}
 
 	moveOutOfBounds(bar.GetBar());
 	onBounce(bar.GetBar());

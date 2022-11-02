@@ -22,8 +22,8 @@ GameController::GameController(sf::RenderWindow& window)
 	createBricks();
 	createWalls(window);
 
-	/*_music.openFromFile("data/sound/main_theme.wav");
-	_music.play();*/
+	_music.openFromFile("data/sound/main_theme.wav");
+	_music.play();
 }
 
 void GameController::Update(const sf::Time elapsed)
@@ -46,12 +46,13 @@ void GameController::Update(const sf::Time elapsed)
 		_player.Update(elapsed);
 	}
 
-	for (auto& wall : _walls)
+	if (_player.IsColliding(_leftWall))
 	{
-		if (_player.IsColliding(wall))
-		{
-			_player.Stop(wall);
-		}
+		_player.Stop(_leftWall);
+	}
+	else if (_player.IsColliding(_rightWall))
+	{
+		_player.Stop(_rightWall);
 	}
 
 	for (auto& ball : _balls)
@@ -65,17 +66,26 @@ void GameController::Update(const sf::Time elapsed)
 				if (ball.IsColliding(bar.GetBar()))
 				{
 					ball.Bounce(bar);
-					onBounce(bar);
+					// playSound(Audio::BOUNCE);
 				}
 			}
 
-			for (const auto& wall : _walls)
+			if (ball.IsColliding(_topWall))
 			{
-				if (ball.IsColliding(wall))
-				{
-					ball.Bounce(wall);
-					//onBounce(wall);
-				}
+				ball.Bounce(_topWall, Direction::UP);
+				// playSound(Audio::BOUNCE);
+			}
+
+			if (ball.IsColliding(_leftWall))
+			{
+				ball.Bounce(_leftWall, Direction::LEFT);
+				// playSound(Audio::BOUNCE);
+			}
+
+			if (ball.IsColliding(_rightWall))
+			{
+				ball.Bounce(_rightWall, Direction::RIGHT);
+				// playSound(Audio::BOUNCE);
 			}
 
 			for (auto& brick : _bricks)
@@ -83,9 +93,11 @@ void GameController::Update(const sf::Time elapsed)
 				if (ball.IsColliding(brick.GetShape()))
 				{
 					ball.Bounce(brick.GetShape());
-					onBounce(brick);
 					brick.Break();
 					_score += 10;
+
+					// playSound(Audio::BRICK_HIT);
+					//TODO: Add brick break animation object to display
 				}
 			}
 		}
@@ -138,10 +150,7 @@ void GameController::Draw(sf::RenderWindow& window) const
 		window.draw(ball);
 	}
 
-	for (const auto& wall : _walls)
-	{
-		window.draw(wall);
-	}
+	window.draw(_topWall);
 
 	for (const auto& brick : _bricks)
 	{
@@ -228,10 +237,10 @@ void GameController::launchBall()
 
 			if (velocity == 0.0f)
 			{
-				velocity = Random::GetFloat(120.0f, 200.0f);
+				velocity = Random::GetFloat(200.0f, 400.0f);
 			}
 
-			ball.Launch(sf::Vector2f(velocity, -200.0f));
+			ball.Launch(sf::Vector2f(velocity, -400.0f));
 			_ballsLeft--;
 
 			if (_ballsLeft > 0)
@@ -263,25 +272,25 @@ void GameController::createBricks()
 	}
 }
 
-void GameController::createWalls(sf::RenderWindow& window)
+void GameController::createWalls(const sf::RenderWindow& window)
 {
-	const sf::Color wallColor = sf::Color(0, 0, 0, 200);
+	const sf::Vector2u size = window.getSize();
 
-	// Create wall around the screen
-	_walls.emplace_back(sf::RectangleShape(sf::Vector2f(window.getSize().x + 100, 24 + 50)));
-	_walls.back().setPosition(-50, -50);
-	_walls.back().setFillColor(wallColor);
+	_topWall = sf::RectangleShape(sf::Vector2f(size.x + 100, 24 + 50));
+	_topWall.setPosition(-50, -50);
+	_topWall.setFillColor(sf::Color(0, 0, 0, 200));
 
-	_walls.emplace_back(sf::RectangleShape(sf::Vector2f(20, window.getSize().y)));
-	_walls.back().setPosition(-20, 24);
-	_walls.back().setFillColor(sf::Color::Transparent);
+	_leftWall = sf::RectangleShape(sf::Vector2f(20, size.y));
+	_leftWall.setPosition(-20, 24);
+	_leftWall.setFillColor(sf::Color::Transparent);
 
-	_walls.emplace_back(sf::RectangleShape(sf::Vector2f(20, window.getSize().y)));
-	_walls.back().setPosition(window.getSize().x, 24);
-	_walls.back().setFillColor(sf::Color::Transparent);
+	_rightWall = sf::RectangleShape(sf::Vector2f(20, size.y));
+	_rightWall.setPosition(size.x, 24);
+	_rightWall.setFillColor(sf::Color::Transparent);
 }
 
-void GameController::onBounce(sf::Drawable& object)
+void GameController::playSound(const Audio audio)
 {
-	//TODO: Play sounds and display effect when ball bounce on an object, depending on the object
+	_sounds.setBuffer(Assets::GetInstance().GetSound(audio));
+	_sounds.play();
 }
